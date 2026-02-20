@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000011">
+<title>Happy Birthday Sophia 💕</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@300;400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    background: #000011;
+    overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
+    color: #fff;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Universe / Stars ─── */
+  #universe {
+    position: fixed; inset: 0;
+    z-index: 0;
+    background: radial-gradient(ellipse at 20% 50%, #0d001a 0%, #000011 50%, #000005 100%);
+  }
+
+  canvas#stars { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+
+  .nebula {
+    position: fixed; border-radius: 50%;
+    filter: blur(80px); opacity: 0.18; z-index: 0;
+    animation: drift 25s ease-in-out infinite alternate;
+  }
+  .nebula-1 { width: 300px; height: 300px; background: #6b21a8; top: -10%; left: -10%; }
+  .nebula-2 { width: 250px; height: 250px; background: #db2777; bottom: -15%; right: -10%; animation-delay: -8s; }
+  .nebula-3 { width: 200px; height: 200px; background: #2563eb; top: 40%; left: 60%; animation-delay: -15s; }
+
+  @keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(20px, -15px) scale(1.15); }
+  }
+
+  /* ─── Screens ─── */
+  .screen {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px;
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .screen.active { display: flex; opacity: 1; }
+
+  .screen.scrollable {
+    justify-content: flex-start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-top: max(40px, env(safe-area-inset-top));
+  }
+
+  /* ─── Screen 1: Heart ─── */
+  .heart-container { position: relative; cursor: pointer; }
+  .heart-container:active { transform: scale(0.95); }
+
+  .heart-svg {
+    width: min(65vw, 280px); height: min(60vw, 260px);
+    filter: drop-shadow(0 0 30px rgba(236,72,153,0.6)) drop-shadow(0 0 60px rgba(236,72,153,0.3));
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.15); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.1); }
+    60% { transform: scale(1); }
+  }
+
+  .heart-text {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -55%);
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    font-weight: 700; color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    pointer-events: none; letter-spacing: 1px; white-space: nowrap;
+  }
+
+  .heart-subtitle {
+    margin-top: 24px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    color: rgba(255,200,220,0.8);
+    animation: fadeFloat 3s ease-in-out infinite;
+    text-align: center; padding: 0 10px;
+  }
+
+  @keyframes fadeFloat {
+    0%, 100% { opacity: 0.6; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-5px); }
+  }
+
+  /* ─── Screen 2: City Options ─── */
+  .options-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 5vw, 2rem);
+    margin-bottom: 6px; text-align: center;
+    background: linear-gradient(135deg, #f9a8d4, #c084fc, #93c5fd);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .options-subtitle {
+    font-size: clamp(0.8rem, 3vw, 0.95rem);
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 24px; text-align: center; padding: 0 10px;
+  }
+
+  .city-cards {
+    display: flex; flex-direction: column;
+    gap: 14px; width: 100%; max-width: 340px; align-items: center;
+  }
+
+  .city-card {
+    width: 100%; border-radius: 18px; overflow: hidden;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+    -webkit-user-select: none; user-select: none;
+  }
+  .city-card:active {
+    transform: scale(0.97);
+    box-shadow: 0 10px 40px rgba(236,72,153,0.25);
+    border-color: rgba(236,72,153,0.4);
+  }
+
+  .city-card-emoji { font-size: 2.2rem; flex-shrink: 0; }
+  .city-card-body { text-align: left; }
+  .city-card-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 2px; }
+  .city-card-cafe { font-size: 0.8rem; color: rgba(255,200,220,0.8); display: flex; align-items: center; gap: 5px; }
+  .city-card-cafe::before { content: '🐱'; }
+
+  .decide-btn-area { margin-top: 24px; text-align: center; padding-bottom: 20px; }
+
+  .btn {
+    display: inline-block; padding: 14px 32px; border-radius: 50px;
+    font-family: 'Quicksand', sans-serif; font-weight: 600;
+    font-size: 16px; border: none; cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.5px;
+    -webkit-appearance: none; touch-action: manipulation;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #ec4899, #a855f7);
+    color: #fff; box-shadow: 0 4px 25px rgba(236,72,153,0.4);
+  }
+  .btn-primary:active { transform: scale(0.96); }
+
+  .btn-outline {
+    background: transparent; color: #f9a8d4;
+    border: 1.5px solid rgba(249,168,212,0.5);
+  }
+  .btn-outline:active { background: rgba(249,168,212,0.15); border-color: #f9a8d4; }
+
+  /* ─── Screen 3: City Info ─── */
+  .info-screen {
+    max-width: 600px; width: 100%; text-align: center; padding-bottom: 30px;
+  }
+
+  .info-city-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 6vw, 2.2rem); margin-bottom: 6px;
+    background: linear-gradient(135deg, #f9a8d4, #c084fc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .info-cafe-name { font-size: clamp(0.9rem, 3.5vw, 1.1rem); color: #f9a8d4; margin-bottom: 18px; }
+
+  .info-text {
+    font-size: clamp(0.85rem, 3.2vw, 0.95rem); line-height: 1.7;
+    color: rgba(255,255,255,0.8); margin-bottom: 20px;
+    text-align: left; padding: 0 6px;
+  }
+
+  .info-link {
+    display: inline-block; margin-bottom: 18px;
+    color: #c084fc; text-decoration: none; font-weight: 600;
+    font-size: 0.95rem; border-bottom: 1px dashed rgba(192,132,252,0.5);
+    padding: 8px 4px;
+  }
+  .info-link:active { color: #e9d5ff; border-color: #e9d5ff; }
+
+  .info-buttons { display: flex; gap: 12px; justify-content: center; }
+
+  /* ─── Screen 4: Decision ─── */
+  .decision-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.4rem, 5vw, 2rem); margin-bottom: 6px; text-align: center;
+    background: linear-gradient(135deg, #f9a8d4, #c084fc);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .decision-subtitle {
+    font-size: clamp(0.8rem, 3vw, 0.95rem);
+    color: rgba(255,255,255,0.6); margin-bottom: 28px; text-align: center;
+  }
+
+  .decision-cards {
+    display: flex; flex-direction: column;
+    gap: 14px; width: 100%; max-width: 300px; align-items: center;
+  }
+
+  .decision-card {
+    width: 100%; padding: 20px 16px; border-radius: 18px;
+    text-align: center; cursor: pointer; transition: all 0.2s;
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  }
+  .decision-card:active {
+    border-color: #ec4899; background: rgba(236,72,153,0.12);
+    transform: scale(0.97); box-shadow: 0 0 30px rgba(236,72,153,0.25);
+  }
+
+  .decision-emoji { font-size: 2.4rem; margin-bottom: 8px; }
+  .decision-card-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 4px; }
+  .decision-card-cafe { font-size: 0.8rem; color: rgba(255,200,220,0.7); }
+  .decision-back { margin-top: 24px; padding-bottom: 20px; }
+
+  /* ─── Screen 5: Celebration ─── */
+  #fireworks-canvas { position: fixed; inset: 0; z-index: 50; pointer-events: none; display: none; }
+
+  .celebration { z-index: 60; text-align: center; padding: 0 10px; }
+
+  .cele-emoji { font-size: 3rem; margin-bottom: 14px; animation: bounce 0.6s ease infinite alternate; }
+  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-12px); } }
+
+  .cele-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 6vw, 2.6rem); margin-bottom: 8px;
+    background: linear-gradient(135deg, #fbbf24, #f472b6, #a78bfa, #38bdf8);
+    background-size: 300% 300%;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: gradientShift 3s ease infinite;
+  }
+  @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+  .cele-subtitle {
+    font-size: clamp(0.9rem, 3.5vw, 1.1rem);
+    color: rgba(255,255,255,0.8); margin-bottom: 24px; font-style: italic;
+  }
+
+  .cele-cafe-info { font-size: clamp(0.85rem, 3vw, 0.95rem); color: rgba(255,200,220,0.8); margin-bottom: 20px; }
+
+  .cele-link {
+    display: inline-block; margin-bottom: 24px; padding: 14px 28px;
+    border-radius: 50px; background: linear-gradient(135deg, #ec4899, #a855f7);
+    color: #fff; text-decoration: none; font-weight: 600; font-size: 16px;
+    box-shadow: 0 4px 25px rgba(236,72,153,0.4);
+    -webkit-appearance: none; touch-action: manipulation;
+  }
+  .cele-link:active { transform: scale(0.96); }
+
+  .restart-btn {
+    display: block; margin: 0 auto; background: transparent;
+    color: rgba(255,255,255,0.5); border: none; cursor: pointer;
+    font-size: 16px; font-family: 'Quicksand', sans-serif; padding: 12px;
+    -webkit-appearance: none; touch-action: manipulation;
+  }
+  .restart-btn:active { color: #fff; }
+
+  /* ─── Desktop ─── */
+  @media (min-width: 700px) {
+    .city-cards, .decision-cards {
+      flex-direction: row; flex-wrap: wrap; justify-content: center; max-width: 900px;
+    }
+    .city-card { width: 260px; flex-direction: column; text-align: center; padding: 24px 20px; }
+    .city-card-emoji { font-size: 3rem; }
+    .city-card-body { text-align: center; }
+    .city-card-cafe { justify-content: center; }
+    .decision-card { width: 240px; }
+    .nebula-1 { width: 600px; height: 600px; filter: blur(120px); }
+    .nebula-2 { width: 500px; height: 500px; filter: blur(120px); }
+    .nebula-3 { width: 400px; height: 400px; filter: blur(120px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="universe">
+  <div class="nebula nebula-1"></div>
+  <div class="nebula nebula-2"></div>
+  <div class="nebula nebula-3"></div>
+</div>
+<canvas id="stars"></canvas>
+
+<!-- SCREEN 1: HEART -->
+<div class="screen active" id="screen-heart">
+  <div class="heart-container" onclick="goTo('screen-options')">
+    <svg class="heart-svg" viewBox="0 0 512 512">
+      <defs>
+        <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#ec4899"/>
+          <stop offset="50%" style="stop-color:#db2777"/>
+          <stop offset="100%" style="stop-color:#be185d"/>
+        </linearGradient>
+      </defs>
+      <path d="M462.3 62.6C407.5 15.9 326 24.3 275.7 76.2L256 96.5l-19.7-20.3C186.1 24.3 104.5 15.9 49.7 62.6c-62.8 53.6-66.1 149.8-9.9 207.9l193.5 199.8c12.5 12.9 32.8 12.9 45.3 0l193.5-199.8c56.3-58.1 53-154.3-9.8-207.9z" fill="url(#heartGrad)"/>
+    </svg>
+    <span class="heart-text">Klick mich! 💕</span>
+  </div>
+  <p class="heart-subtitle">Alles Gute zum Geburtstag, Sophia! 🎂</p>
+</div>
+
+<!-- SCREEN 2: OPTIONS -->
+<div class="screen scrollable" id="screen-options">
+  <h1 class="options-title">Wohin geht unser Abenteuer? 🌍</h1>
+  <p class="options-subtitle">Drei wundervolle Städte — jede mit einem Cat Café!</p>
+  <div class="city-cards">
+    <div class="city-card" onclick="showInfo('nuernberg')">
+      <div class="city-card-emoji">🏰</div>
+      <div class="city-card-body">
+        <div class="city-card-name">Nürnberg</div>
+        <div class="city-card-cafe">Katzentempel Nürnberg</div>
+      </div>
+    </div>
+    <div class="city-card" onclick="showInfo('hamburg')">
+      <div class="city-card-emoji">⚓</div>
+      <div class="city-card-body">
+        <div class="city-card-name">Hamburg</div>
+        <div class="city-card-cafe">Katers Köök</div>
+      </div>
+    </div>
+    <div class="city-card" onclick="showInfo('berlin')">
+      <div class="city-card-emoji">🐻</div>
+      <div class="city-card-body">
+        <div class="city-card-name">Berlin</div>
+        <div class="city-card-cafe">Pee Pees Katzencafé</div>
+      </div>
+    </div>
+  </div>
+  <div class="decide-btn-area">
+    <button class="btn btn-primary" onclick="goTo('screen-decide')">🎯 Entscheidungsfeld</button>
+  </div>
+</div>
+
+<!-- SCREEN 3a: Nürnberg -->
+<div class="screen scrollable" id="screen-info-nuernberg">
+  <div class="info-screen">
+    <h2 class="info-city-name">Nürnberg</h2>
+    <p class="info-cafe-name">🐱 Katzentempel Nürnberg</p>
+    <div class="info-text">
+      Mitten in der Nürnberger Altstadt, nur wenige Gehminuten von der Lorenzkirche entfernt, wartet der Katzentempel auf uns! Hier erwarten uns liebevolle Tempelkatzen und ein komplett veganes Menü mit frischen, regionalen Bio-Produkten. Der Katzentempel Nürnberg ist einer der ältesten Standorte — ein echtes Wohlfühl-Erlebnis mit Schnurr-Garantie! Dazu gibt es die wunderschöne Nürnberger Altstadt mit Kaiserburg, Fachwerkhäusern und dem berühmten Lebkuchen. 🏰
+    </div>
+    <a class="info-link" href="https://katzentempel.de/standorte/nuernberg/" target="_blank">🔗 Zur Website des Katzentempels →</a>
+    <div class="info-buttons">
+      <button class="btn btn-outline" onclick="goTo('screen-options')">← Zurück</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3b: Hamburg -->
+<div class="screen scrollable" id="screen-info-hamburg">
+  <div class="info-screen">
+    <h2 class="info-city-name">Hamburg</h2>
+    <p class="info-cafe-name">🐱 Katers Köök</p>
+    <div class="info-text">
+      Im Hamburger Schanzenviertel erwartet uns das Katers Köök — ein veganes Deli und Katzencafé direkt gegenüber vom Sternschanzenpark! Hier leben Tierschutzkatzen, die ihr „Forever Home" gefunden haben. Die nordisch angehauchte, vegane Küche bietet alles von Frühstück bis Abendbrot. Dazu die Stadt mit Elbphilharmonie, Speicherstadt, Landungsbrücken und dem Hamburger Hafen — pure Romantik am Wasser! ⚓
+    </div>
+    <a class="info-link" href="https://katers-koeoek.de/" target="_blank">🔗 Zur Website von Katers Köök →</a>
+    <div class="info-buttons">
+      <button class="btn btn-outline" onclick="goTo('screen-options')">← Zurück</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3c: Berlin -->
+<div class="screen scrollable" id="screen-info-berlin">
+  <div class="info-screen">
+    <h2 class="info-city-name">Berlin</h2>
+    <p class="info-cafe-name">🐱 Pee Pees Katzencafé</p>
+    <div class="info-text">
+      Berlins allererstes Katzencafé! Im Neuköllner Körnerkiez, ganz in der Nähe vom Tempelhofer Feld, erwartet uns Pee Pees Katzencafé mit den Katzen Skadi, Ylvi und Odin. Hier gibt es selbstgemachte Torten, Kuchen und herzhafte Speisen — alles frisch und in Bio-Qualität. Ein gemütlicher, liebevoll eingerichteter Ort zum Entspannen und Schmusen mit den Samtpfoten. Dazu das bunte Berlin mit all seinen Vibes! 🐻
+    </div>
+    <a class="info-link" href="http://peepeeskatzencafe.de/" target="_blank">🔗 Zur Website von Pee Pees →</a>
+    <div class="info-buttons">
+      <button class="btn btn-outline" onclick="goTo('screen-options')">← Zurück</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 4: DECISION -->
+<div class="screen scrollable" id="screen-decide">
+  <h2 class="decision-title">Entscheide dich! 💫</h2>
+  <p class="decision-subtitle">Wohin soll unsere Reise gehen?</p>
+  <div class="decision-cards">
+    <div class="decision-card" onclick="celebrate('Nürnberg', 'Katzentempel Nürnberg', 'https://katzentempel.de/standorte/nuernberg/')">
+      <div class="decision-emoji">🏰</div>
+      <div class="decision-card-name">Nürnberg</div>
+      <div class="decision-card-cafe">Katzentempel</div>
+    </div>
+    <div class="decision-card" onclick="celebrate('Hamburg', 'Katers Köök', 'https://katers-koeoek.de/')">
+      <div class="decision-emoji">⚓</div>
+      <div class="decision-card-name">Hamburg</div>
+      <div class="decision-card-cafe">Katers Köök</div>
+    </div>
+    <div class="decision-card" onclick="celebrate('Berlin', 'Pee Pees Katzencafé', 'http://peepeeskatzencafe.de/')">
+      <div class="decision-emoji">🐻</div>
+      <div class="decision-card-name">Berlin</div>
+      <div class="decision-card-cafe">Pee Pees Katzencafé</div>
+    </div>
+  </div>
+  <div class="decision-back">
+    <button class="btn btn-outline" onclick="goTo('screen-options')">← Zurück zu den Optionen</button>
+  </div>
+</div>
+
+<!-- SCREEN 5: CELEBRATION -->
+<canvas id="fireworks-canvas"></canvas>
+<div class="screen" id="screen-celebrate">
+  <div class="celebration">
+    <div class="cele-emoji">🎉🐱🎆</div>
+    <h1 class="cele-title" id="cele-title-text"></h1>
+    <p class="cele-subtitle" id="cele-subtitle-text"></p>
+    <p class="cele-cafe-info" id="cele-cafe-text"></p>
+    <a class="cele-link" id="cele-link" href="#" target="_blank">🐱 Zum Cat Café →</a>
+    <br><br>
+    <button class="restart-btn" onclick="restart()">🔄 Nochmal von vorne</button>
+  </div>
+</div>
+
+<script>
+const starsCanvas = document.getElementById('stars');
+const starsCtx = starsCanvas.getContext('2d');
+let stars = [];
+const isMobile = window.innerWidth < 700;
+
+function resizeStars() {
+  starsCanvas.width = window.innerWidth;
+  starsCanvas.height = window.innerHeight;
+  stars = [];
+  const density = isMobile ? 6000 : 3000;
+  const count = Math.floor((starsCanvas.width * starsCanvas.height) / density);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * starsCanvas.width,
+      y: Math.random() * starsCanvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      alpha: Math.random(),
+      speed: Math.random() * 0.005 + 0.002,
+      dir: Math.random() > 0.5 ? 1 : -1
+    });
+  }
+}
+
+function drawStars() {
+  starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+  for (const s of stars) {
+    s.alpha += s.speed * s.dir;
+    if (s.alpha >= 1) s.dir = -1;
+    if (s.alpha <= 0.1) s.dir = 1;
+    starsCtx.beginPath();
+    starsCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    starsCtx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+    starsCtx.fill();
+  }
+  requestAnimationFrame(drawStars);
+}
+
+window.addEventListener('resize', resizeStars);
+resizeStars();
+drawStars();
+
+setInterval(() => {
+  if (Math.random() > 0.6) {
+    const sx = Math.random() * starsCanvas.width;
+    const sy = Math.random() * starsCanvas.height * 0.5;
+    const len = 80 + Math.random() * 120;
+    const angle = Math.PI / 4 + Math.random() * 0.3;
+    let progress = 0;
+    function drawShoot() {
+      if (progress > 1) return;
+      progress += 0.04;
+      starsCtx.beginPath();
+      starsCtx.arc(sx + len * progress * Math.cos(angle), sy + len * progress * Math.sin(angle), 1.5, 0, Math.PI * 2);
+      starsCtx.fillStyle = `rgba(255,255,255,${1 - progress})`;
+      starsCtx.fill();
+      requestAnimationFrame(drawShoot);
+    }
+    drawShoot();
+  }
+}, 4000);
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  requestAnimationFrame(() => {
+    target.classList.add('active');
+    if (target.classList.contains('scrollable')) target.scrollTop = 0;
+  });
+}
+
+function showInfo(city) { goTo('screen-info-' + city); }
+function restart() { stopFireworks(); goTo('screen-heart'); }
+
+const fwCanvas = document.getElementById('fireworks-canvas');
+const fwCtx = fwCanvas.getContext('2d');
+let fireworks = [], particles = [], fwRunning = false, fwAnimId = null;
+const fwPC = isMobile ? 35 : 60;
+
+function resizeFw() { fwCanvas.width = window.innerWidth; fwCanvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeFw);
+resizeFw();
+
+class Firework {
+  constructor() {
+    this.x = Math.random() * fwCanvas.width;
+    this.y = fwCanvas.height;
+    this.targetY = Math.random() * fwCanvas.height * 0.5 + 50;
+    this.speed = 4 + Math.random() * 3;
+    this.hue = Math.random() * 360;
+    this.alive = true;
+  }
+  update() {
+    this.y -= this.speed;
+    if (this.y <= this.targetY) {
+      this.alive = false;
+      for (let i = 0; i < fwPC + Math.random() * 20; i++) particles.push(new Particle(this.x, this.y, this.hue));
+    }
+  }
+  draw() {
+    fwCtx.beginPath();
+    fwCtx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+    fwCtx.fillStyle = `hsl(${this.hue},100%,70%)`;
+    fwCtx.fill();
+  }
+}
+
+class Particle {
+  constructor(x, y, hue) {
+    this.x = x; this.y = y;
+    const a = Math.random() * Math.PI * 2, sp = Math.random() * 4 + 1;
+    this.vx = Math.cos(a) * sp; this.vy = Math.sin(a) * sp;
+    this.alpha = 1; this.decay = Math.random() * 0.015 + 0.01;
+    this.hue = hue + Math.random() * 30 - 15;
+    this.size = Math.random() * 2.5 + 0.5;
+  }
+  update() { this.x += this.vx; this.y += this.vy; this.vy += 0.04; this.alpha -= this.decay; }
+  draw() {
+    fwCtx.beginPath();
+    fwCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    fwCtx.fillStyle = `hsla(${this.hue},100%,65%,${this.alpha})`;
+    fwCtx.fill();
+  }
+}
+
+function fwLoop() {
+  if (!fwRunning) return;
+  fwCtx.globalCompositeOperation = 'destination-out';
+  fwCtx.fillStyle = 'rgba(0,0,0,0.15)';
+  fwCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fwCtx.globalCompositeOperation = 'lighter';
+  if (Math.random() < 0.07) fireworks.push(new Firework());
+  fireworks = fireworks.filter(f => f.alive);
+  fireworks.forEach(f => { f.update(); f.draw(); });
+  particles = particles.filter(p => p.alpha > 0);
+  particles.forEach(p => { p.update(); p.draw(); });
+  fwAnimId = requestAnimationFrame(fwLoop);
+}
+
+function startFireworks() {
+  fwCanvas.style.display = 'block';
+  fwRunning = true; fireworks = []; particles = [];
+  for (let i = 0; i < 6; i++) { const fw = new Firework(); fw.targetY = Math.random() * fwCanvas.height * 0.4 + 80; fireworks.push(fw); }
+  fwLoop();
+}
+
+function stopFireworks() {
+  fwRunning = false;
+  if (fwAnimId) cancelAnimationFrame(fwAnimId);
+  fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fwCanvas.style.display = 'none';
+}
+
+function celebrate(city, cafe, link) {
+  document.getElementById('cele-title-text').textContent = `Yeah, wir gehen nach ${city}! 🎉`;
+  document.getElementById('cele-subtitle-text').textContent = `Unser Abenteuer beginnt — Katzen, Kuchen und ganz viel Liebe!`;
+  document.getElementById('cele-cafe-text').textContent = `🐾 ${cafe} wartet auf uns!`;
+  document.getElementById('cele-link').href = link;
+  goTo('screen-celebrate');
+  setTimeout(startFireworks, 300);
+}
+</script>
+</body>
+</html>
